@@ -1,0 +1,49 @@
+
+<configuration>
+    <timestamp key="myTimestamp" datePattern="yyyy-MM-dd"/>
+
+    <property name="DEV_HOME" value="c:/logs" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %class %method  %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>${log.dir}/client-tests-${myTimestamp}.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${log.dir}/client-tests-${myTimestamp}.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>1MB</MaxFileSize>
+        </triggeringPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %class %method  %logger{36} - %msg%n</pattern>
+        </layout>
+    </appender>
+
+
+    <logger name="browser_steps" level="INFO">
+    <appender-ref ref="FILE" />
+    </logger>
+    <logger name="mobile_steps" level="INFO">
+    <appender-ref ref="FILE" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>
