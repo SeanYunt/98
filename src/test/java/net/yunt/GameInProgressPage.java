@@ -13,78 +13,76 @@ import org.openqa.selenium.support.PageFactory;
 
 public class GameInProgressPage {
 	private WebDriver driver;
-    
-    @FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[1]/form/input[1]")
-    private WebElement play1Button;
-    
-    @FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[2]/form/input[1]")
-    private WebElement play2Button;
-    
-    @FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[3]/form/input[1]")
-    private WebElement play3Button;
-
-    @FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[4]/form/input[1]")
-    private WebElement play4Button;
 	
-    @FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[1]/div[2]/form/input[1]")
-    private WebElement passResetButton;
-    
-    public HashMap<String,String> gameStateMap = new HashMap();
+	@FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[1]/form/input[1]")
+	private WebElement play1Button;
+	
+	@FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[2]/form/input[1]")
+	private WebElement play2Button;
+	
+	@FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[3]/form/input[1]")
+	private WebElement play3Button;
+
+	@FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[2]/div[1]/div[4]/form/input[1]")
+	private WebElement play4Button;
+	
+	@FindBy(xpath = "//*[@id=\"game_board\"]/div/div[1]/div[1]/div[2]/form/input[1]")
+	private WebElement passResetButton;
+	
+	public HashMap<String,String> gameStateMap = new HashMap();
 
 
 	public GameInProgressPage(WebDriver driver) {
 		this.driver = driver;
-        PageFactory.initElements(driver, this);
-        long maxWait = 3000;
-        boolean containsText = false;
-        long startTime = System.currentTimeMillis();
-        while(!containsText && System.currentTimeMillis()-startTime < maxWait) {
-        	String bodyText = driver.findElement(By.tagName("body")).getText();
-        	if(bodyText.contains("Game in Progress")) {
-        		containsText = true;
-        		break;
-        	}
-        }
-        assertTrue("Expected to find Game in Progress", containsText);
-        //updateCurrentGameState();
+		PageFactory.initElements(driver, this);
+		long maxWait = 3000;
+		boolean containsText = false;
+		long startTime = System.currentTimeMillis();
+		while(!containsText && System.currentTimeMillis()-startTime < maxWait) {
+			String bodyText = driver.findElement(By.tagName("body")).getText();
+			if(bodyText.contains("Game in Progress")) {
+				containsText = true;
+				break;
+			}
+		}
+		assertTrue("Expected to find Game in Progress", containsText);
+		//updateCurrentGameState();
 	}
 	
 	
 	public GameInProgressPage play1() throws Exception {
 		play1Button.click();
 		updateCurrentGameState();
-		Thread.sleep(1000);
-		printCurrentGameState();
-	    return this;
+		return this;
 	}
 	
 	public GameInProgressPage play2() throws Exception {
 		play2Button.click();
 		updateCurrentGameState();
-	    return this;
+		return this;
 	}
 	
 	public GameInProgressPage play3() throws Exception {
 		play3Button.click();
 		updateCurrentGameState();
-	    return this;
+		return this;
 	}
 	
 	public GameInProgressPage play4() throws Exception {
 		play4Button.click();
 		updateCurrentGameState();
-	    return this;
+		return this;
 	}
 	
 	public GameInProgressPage clickPassReset() throws Exception {
 		passResetButton.click();
 		updateCurrentGameState();
-	    return this;
+		return this;
 	}
 	
 	
 	private void updateCurrentGameState() throws Exception {
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		for(int i=1;i<5;i++) {
 			for(int j=1;j<5;j++) {
 				String positionValue = null;
@@ -100,13 +98,14 @@ public class GameInProgressPage {
 				gameStateMap.put(i+":"+j,positionValue);
 			}
 		}
+
 	}
 	
-	private void printCurrentGameState( ) {
+	public void printCurrentGameState( ) {
 		System.out.println("----");
 		for (String key: gameStateMap.keySet()) {
-            String value = gameStateMap.get(key).toString();  
-            System.out.println(key + " " + value);  
+			String value = gameStateMap.get(key).toString();  
+			System.out.println(key + " " + value);  
 		} 
 		System.out.println("----");
 	}
@@ -129,5 +128,52 @@ public class GameInProgressPage {
 			}
 		}
 		return count;
+	}
+	
+	public int getTallestColumn() {
+		int tallestColumn = -1;
+		for(int i=4;i>0;i--) {
+			for(int j=4;j>0;j--) {
+				if(gameStateMap.get(i+":"+j).contains("X") || gameStateMap.get(i+":"+j).contains("O")) {
+					tallestColumn = j;
+					break;
+				}
+			}
+			if(tallestColumn > -1) break;
+		}
+		return tallestColumn;
+	}
+	
+	public int getEmptyColumn() {
+		int emptyColumn = -1;
+		for(int i=1;i<4;i--) {
+			for(int j=0;j<4;j--) {
+				if(!gameStateMap.get(i+":"+j).contains("X") && !gameStateMap.get(i+":"+j).contains("O")) {
+					emptyColumn = j;
+					break;
+				}
+			}
+			if(emptyColumn > -1) break;
+		}
+		System.out.println("Empty Column: "+emptyColumn);
+		return emptyColumn;
+	}
+	
+	public String getValueAt(int x, int y) {
+		return gameStateMap.get(x+":"+y);
+	}
+	
+	public boolean isGameOver() {
+		long maxWait = 3000;
+		boolean containsText = false;
+		long startTime = System.currentTimeMillis();
+		while(!containsText && System.currentTimeMillis()-startTime < maxWait) {
+			String bodyText = driver.findElement(By.tagName("body")).getText();
+			if(bodyText.contains("Game Over")) {
+				containsText = true;
+				break;
+			}
+		}
+		return containsText;
 	}
 }
